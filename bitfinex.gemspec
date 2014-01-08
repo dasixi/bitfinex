@@ -8,4 +8,5 @@ Gem::Specification.new do |s|
   s.email       = 'jwilkins@bitland.net'
   s.files       = ["lib/bitfinex.rb"]
   s.homepage    = 'https://rubygems.org/gems/bitfinex'
+  s.add_dependency 'httparty'
 end

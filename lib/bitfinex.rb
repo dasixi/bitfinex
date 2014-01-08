@@ -68,6 +68,12 @@ class BitFinex
     self.class.post(url, :headers => headers_for(url)).parsed_response
   end
 
+  def orders
+    return nil unless have_key?
+    url = "/v1/orders"
+    self.class.post(url, :headers => headers_for(url)).parsed_response
+  end
+
   def status(order_id)
     return nil unless have_key?
     url = "/v1/order/status"
@@ -102,6 +108,13 @@ class BitFinex
   def order(size, price=nil, type='limit', sym='btcusd', routing='all', side='buy', hide=false)
     return nil unless have_key?
     url = "/v1/order/new"
+
+    if size < 0
+      size = size.abs.to_s
+      side = 'sell'
+    end
+    type = 'market' unless price
+
     order = {
       'symbol' => sym,
       'amount' => size.to_s,
@@ -110,18 +123,7 @@ class BitFinex
       'type' => type
     }
 
-    unless price
-      # no price if market order
-      type = 'market'
-    else
-      order[:price] = price.to_s unless type == 'market'
-    end
-
-    if size < 0
-      size = size.abs.to_s
-      side = 'sell'
-    end
-
+    order['price'] = price.to_s unless type == 'market'
     order['is_hidden'] = true if hide
 
     self.class.post(url, :headers => headers_for(url, order)).parsed_response
@@ -140,8 +142,11 @@ class BitFinex
     self.class.get("/v1/candles/#{sym}", options).parsed_response
   end
 
-  def orderbook(sym='btcusd')
-    self.class.get("/v1/book/#{sym}").parsed_response
+  def orderbook(sym='btcusd', options={})
+    str = options.collect{|k, v| "#{k}=#{v}"}.join('&')
+    url = "/v1/book/#{sym}"
+    url += "?#{str}" unless str.empty?
+    self.class.get(url).parsed_response
   end
 
   def lendbook(sym='btc')
