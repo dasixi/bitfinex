@@ -48,7 +48,7 @@ class BitFinex
     payload = {}
     payload['request'] = url
     # nonce needs to be a string, server error is wrong
-    payload['nonce'] = Time.now.to_i.to_s
+    payload['nonce'] = (Time.now.to_f*1000).round.to_s
     payload.merge!(options)
 
     payload_enc = Base64.encode64(payload.to_json).gsub(/\s/, '')
