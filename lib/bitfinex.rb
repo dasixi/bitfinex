@@ -20,6 +20,7 @@ end
 
 class BitFinex
   include HTTParty
+  default_timeout 15
   base_uri 'https://api.bitfinex.com'
   format :json
 
